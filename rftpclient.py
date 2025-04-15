@@ -93,9 +93,26 @@ def cmd_rmdir(ftp, directory):
     else:
         print("No active connection.")
 
+def cmd_help():
+    """Display help information."""
+    print("""
+        Available commands:
+        help - Display this help message.
+        connect <hostname> <username> <password> - Connect to the FTP server.
+        disconnect - Disconnect from the FTP server.
+        ls, dir - List files in the current directory.
+        send <local_file> <remote_file> - Send a file to the FTP server.
+        recv <remote_file> <local_file> - Receive a file from the FTP server.
+        cd <directory> - Change the current directory.
+        mkdir <directory> - Create a new directory.
+        rmdir <directory> - Remove a directory.
+        exit, quit - Disconnect and exit the client.
+    """)
+
 
 if __name__ == "__main__":
     cmd_map = {
+        "help": cmd_help,
         "connect": cmd_connect,
         "disconnect": cmd_disconnect,
         "ls": cmd_ls,
@@ -149,6 +166,8 @@ if __name__ == "__main__":
                     cmd_map[command](ftp, directory)
                 else:
                     print("No active connection.")
+            elif command == "help":
+                cmd_map[command]()
             else:
                 if ftp:
                     cmd_map[command](ftp)
