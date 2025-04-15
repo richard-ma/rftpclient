@@ -82,6 +82,17 @@ def cmd_mkdir(ftp, directory):
     else:
         print("No active connection.")
 
+def cmd_rmdir(ftp, directory):
+    """Remove a directory."""
+    if ftp:
+        try:
+            ftp.rmd(directory)
+            print(f"Removed directory {directory}.")
+        except ftplib.all_errors as e:
+            print(f"Failed to remove directory: {e}")
+    else:
+        print("No active connection.")
+
 
 if __name__ == "__main__":
     cmd_map = {
@@ -97,6 +108,7 @@ if __name__ == "__main__":
         "get": cmd_recv,
         "cd": cmd_cd,
         "mkdir": cmd_mkdir,
+        "rmdir": cmd_rmdir,
     }
 
     running = True
@@ -109,11 +121,6 @@ if __name__ == "__main__":
                 username = input("Enter username: ")
                 password = input("Enter password: ")
                 ftp = cmd_map[command](hostname, username, password)
-            elif command == "disconnect":
-                if ftp:
-                    cmd_map[command](ftp) # only disconnect if connected
-                else:
-                    print("No active connection to disconnect.")
             elif command in ["ls", "dir"]:
                 if ftp:
                     cmd_map[command](ftp)
@@ -136,19 +143,16 @@ if __name__ == "__main__":
                     cmd_map[command](ftp, remote_file, local_file)
                 else:
                     print("No active connection.")
-            elif command == "cd":
+            elif command in ["cd", "mkdir", "rmdir"]:
                 if ftp:
                     directory = input("Enter directory path: ")
                     cmd_map[command](ftp, directory)
                 else:
                     print("No active connection.")
-            elif command == "mkdir":
+            else:
                 if ftp:
-                    directory = input("Enter directory name: ")
-                    cmd_map[command](ftp, directory)
+                    cmd_map[command](ftp)
                 else:
                     print("No active connection.")
-            else:
-                print("Unknown command. Please try again.")
         else:
             print("Unknown command. Please try again.")
