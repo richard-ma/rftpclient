@@ -56,7 +56,7 @@ if __name__ == "__main__":
                 cmd_map[command](ftp)
             elif command in ["ls", "dir"]:
                 cmd_map[command](ftp)
-            elif command == "exit":
+            elif command == ["exit", "quit"]:
                 running = False
         else:
             print("Unknown command. Please try again.")
