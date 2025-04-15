@@ -71,6 +71,17 @@ def cmd_cd(ftp, directory):
     else:
         print("No active connection.")
 
+def cmd_mkdir(ftp, directory):
+    """Create a new directory."""
+    if ftp:
+        try:
+            ftp.mkd(directory)
+            print(f"Created directory {directory}.")
+        except ftplib.all_errors as e:
+            print(f"Failed to create directory: {e}")
+    else:
+        print("No active connection.")
+
 
 if __name__ == "__main__":
     cmd_map = {
@@ -85,6 +96,7 @@ if __name__ == "__main__":
         "recv": cmd_recv,
         "get": cmd_recv,
         "cd": cmd_cd,
+        "mkdir": cmd_mkdir,
     }
 
     running = True
@@ -127,6 +139,12 @@ if __name__ == "__main__":
             elif command == "cd":
                 if ftp:
                     directory = input("Enter directory path: ")
+                    cmd_map[command](ftp, directory)
+                else:
+                    print("No active connection.")
+            elif command == "mkdir":
+                if ftp:
+                    directory = input("Enter directory name: ")
                     cmd_map[command](ftp, directory)
                 else:
                     print("No active connection.")
