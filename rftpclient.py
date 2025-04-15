@@ -40,11 +40,13 @@ if __name__ == "__main__":
         "disconnect": cmd_disconnect,
         "ls": cmd_ls,
         "dir": cmd_ls,
+        "exit": None,
+        "quit": None,
     }
 
     running = True
     while running:
-        command = input("rftpclient>>").strip().lower()
+        command = input("rftpclient >> ").strip().lower()
 
         if command in cmd_map:
             if command == "connect":
