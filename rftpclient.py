@@ -44,7 +44,9 @@ if __name__ == "__main__":
 
     running = True
     while running:
+        print("rftpclient>>", newline=False, end=" ")
         command = input("Enter command (connect/disconnect): ").strip().lower()
+
         if command in cmd_map:
             if command == "connect":
                 hostname = input("Enter hostname: ")
