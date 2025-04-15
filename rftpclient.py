@@ -20,6 +20,33 @@ def cmd_disconnect(ftp):
     else:
         print("No active connection to disconnect.")
 
+def cmd_send(ftp, local_file, remote_file):
+    """Send a file to the FTP server."""
+    if ftp:
+        try:
+            with open(local_file, 'rb') as f:
+                ftp.storbinary(f"STOR {remote_file}", f)
+            print(f"Sent {local_file} to {remote_file}.")
+        except FileNotFoundError:
+            print(f"Local file {local_file} not found.")
+        except ftplib.all_errors as e:
+            print(f"Failed to send file: {e}")
+    else:
+        print("No active connection.")
+        
+
+def cmd_recv(ftp, remote_file, local_file):
+    """Receive a file from the FTP server."""
+    if ftp:
+        try:
+            with open(local_file, 'wb') as f:
+                ftp.retrbinary(f"RETR {remote_file}", f.write)
+            print(f"Received {remote_file} and saved as {local_file}.")
+        except ftplib.all_errors as e:
+            print(f"Failed to receive file: {e}")
+    else:
+        print("No active connection.")
+
 def cmd_ls(ftp):
     """List files in the current directory."""
     if ftp:
@@ -33,6 +60,17 @@ def cmd_ls(ftp):
     else:
         print("No active connection.")
 
+def cmd_cd(ftp, directory):
+    """Change the current directory."""
+    if ftp:
+        try:
+            ftp.cwd(directory)
+            print(f"Changed directory to {directory}.")
+        except ftplib.all_errors as e:
+            print(f"Failed to change directory: {e}")
+    else:
+        print("No active connection.")
+
 
 if __name__ == "__main__":
     cmd_map = {
@@ -40,8 +78,13 @@ if __name__ == "__main__":
         "disconnect": cmd_disconnect,
         "ls": cmd_ls,
         "dir": cmd_ls,
-        "exit": None,
-        "quit": None,
+        "exit": cmd_disconnect,
+        "quit": cmd_disconnect,
+        "send": cmd_send,
+        "put": cmd_send,
+        "recv": cmd_recv,
+        "get": cmd_recv,
+        "cd": cmd_cd,
     }
 
     running = True
@@ -55,11 +98,38 @@ if __name__ == "__main__":
                 password = input("Enter password: ")
                 ftp = cmd_map[command](hostname, username, password)
             elif command == "disconnect":
-                cmd_map[command](ftp)
+                if ftp:
+                    cmd_map[command](ftp) # only disconnect if connected
+                else:
+                    print("No active connection to disconnect.")
             elif command in ["ls", "dir"]:
-                cmd_map[command](ftp)
+                if ftp:
+                    cmd_map[command](ftp)
+                else:
+                    print("No active connection.")
             elif command in ["exit", "quit"]:
                 running = False
+                cmd_map[command](ftp) # Disconnect before exiting
+            elif command in ["send", "put"]:
+                if ftp:
+                    local_file = input("Enter local file path: ")
+                    remote_file = input("Enter remote file name: ")
+                    cmd_map[command](ftp, local_file, remote_file)
+                else:
+                    print("No active connection.")
+            elif command in ["recv", "get"]:
+                if ftp:
+                    remote_file = input("Enter remote file name: ")
+                    local_file = input("Enter local file path: ")
+                    cmd_map[command](ftp, remote_file, local_file)
+                else:
+                    print("No active connection.")
+            elif command == "cd":
+                if ftp:
+                    directory = input("Enter directory path: ")
+                    cmd_map[command](ftp, directory)
+                else:
+                    print("No active connection.")
             else:
                 print("Unknown command. Please try again.")
         else:
