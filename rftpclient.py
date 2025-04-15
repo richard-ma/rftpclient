@@ -20,11 +20,26 @@ def cmd_disconnect(ftp):
     else:
         print("No active connection to disconnect.")
 
+def cmd_ls(ftp):
+    """List files in the current directory."""
+    if ftp:
+        try:
+            files = ftp.nlst()
+            print("Files in current directory:")
+            for file in files:
+                print(file)
+        except ftplib.all_errors as e:
+            print(f"Failed to list files: {e}")
+    else:
+        print("No active connection.")
+
 
 if __name__ == "__main__":
     cmd_map = {
         "connect": cmd_connect,
         "disconnect": cmd_disconnect,
+        "ls": cmd_ls,
+        "dir": cmd_ls,
     }
 
     running = True
@@ -37,7 +52,10 @@ if __name__ == "__main__":
                 password = input("Enter password: ")
                 ftp = cmd_map[command](hostname, username, password)
             elif command == "disconnect":
-                running = False
                 cmd_map[command](ftp)
+            elif command in ["ls", "dir"]:
+                cmd_map[command](ftp)
+            elif command == "exit":
+                running = False
         else:
             print("Unknown command. Please try again.")
